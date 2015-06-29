@@ -1,0 +1,349 @@
+---
+title: "Problem Set 3"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(ggplot2) #must load the ggplot package first 
+library(ggthemes) 
+theme_set(theme_minimal(24)) 
+data(diamonds) #loads the diamonds data set since it comes with the ggplot package 
+
+summary(diamonds)
+?diamonds
+```
+
+
+# In this problem set, you'll continue
+# to explore the diamonds data set.
+
+# Your first task is to create a
+# scatterplot of price vs x.
+# using the ggplot syntax.
+
+# This assignment is not graded and
+# will be marked as correct when you submit.
+
+# ENTER YOUR CODE BELOW THIS LINE
+# ===========================================
+
+Observations:
+
+The price length of diamonds seems to increase in general with price. Most seem to be in the 6-9 mm range, and variability in the data increases with price. There are also at least 7 outliers that appear to have an x value at or near 0, which seems unlikely, especially since 6 out of 7 of them cost more than $5000. There also seems to be an exponential relationship between x and price. 
+
+```{r}
+
+ggplot(aes(x = x, y = price), 
+       data = diamonds) + 
+  geom_point()
+```
+
+What is the correlation between x and price?
+0.884
+What is the correlation between y and price?
+0.865
+What is the correlation between z and price?
+0.861
+
+```{r}
+with(diamonds, cor.test(price, x))
+
+with(diamonds, cor.test(price, y))
+
+with(diamonds, cor.test(price, z))
+
+```
+
+# Create a simple scatter plot of price vs depth.
+
+# This assignment is not graded and
+# will be marked as correct when you submit.
+
+# ENTER YOUR CODE BELOW THIS LINE
+#==================================================
+
+```{r}
+ggplot(aes(x = depth, y = price), 
+       data = diamonds) + 
+  geom_point()
+
+```
+
+# Change the code to make the transparency of the
+# points to be 1/100 of what they are now and mark
+# the x-axis every 2 units. See the instructor notes
+# for two hints.
+
+# This assignment is not graded and
+# will be marked as correct when you submit.
+
+# ALTER THE CODE BELOW THIS LINE
+#============================================
+
+```{r}
+ggplot(data = diamonds, aes(x = depth, y = price)) + 
+  geom_point(alpha = 1/100) +
+  scale_x_continuous(breaks = seq(0, 80, 2))
+
+```
+
+What's the correlation of depth versus price? 
+-0.0106474 
+Based on the correlation coefficient would you use depth to predict the price of a diamond?
+No, they are VERY weakly correlated because they have a very small correlation coefficient.
+```{r}
+with(diamonds, cor.test(price, depth))
+```
+
+
+# Create a scatterplot of price vs carat
+# and omit the top 1% of price and carat
+# values.
+
+# This assignment is not graded and
+# will be marked as correct when you submit.
+
+# ENTER YOUR CODE BELOW THIS LINE
+# ========================================
+
+
+
+```{r}
+ggplot(aes(x = carat, y = price), 
+       data = diamonds) + 
+  geom_point() +  
+  xlim(0, quantile(diamonds$carat, 0.99)) +
+  ylim(0, quantile(diamonds$price, 0.99)) 
+
+```
+
+# Create a scatterplot of price vs. volume (x * y * z).
+# This is a very rough approximation for a diamond's volume.
+
+# Create a new variable for volume in the diamonds data frame.
+# This will be useful in a later exercise.
+
+# Don't make any adjustments to the plot just yet.
+
+# This assignment is not graded and
+# will be marked as correct when you submit.
+
+# ENTER YOUR CODE BELOW THIS LINE
+# =================================================================
+
+What are your observations from the price vs. volume scatterplot?
+
+There seems to be an exponential relationship between price and volume, with price increasing rapidly with an increase in volume. There are also a few distinct outliers worth examining: a couple with very high volume and low price, and one with massive volume and a moderately high price. 
+
+Official answer:
+
+Did you notice some outliers? Some volumes are 0! There's an expensive diamond with a volume near 4000, and a cheaper diamond with a volume near 900.
+
+You can find out how many diamonds have 0 volume by using count(diamonds$volume == 0). The count() function comes with the plyr package.
+
+Note: You need to run this command in R to unload the plyr package. detach("package:plyr", unload=TRUE) The plyr package will conflict with the dplyr package in later exercises.
+
+Depending on your investigation, it may or may not be important for you to understand how outliers, like these, came to be in your data.
+```{r}
+
+diamonds$volume <- with(diamonds, (x * y * z))
+
+ggplot(aes(x = volume, y = price), 
+       data = diamonds) + 
+  geom_point() 
+```
+
+
+What's the correlation between price and volume? Exclude diamonds that have a volume of 0 or that are greater than or equal to 800. 
+
+Instructor Notes
+
+Hint 1: It’s helpful to add a variable for volume to the diamonds data frame. You should exclude diamonds that have a volume greater than or equal to 800. Also, exclude diamonds that have a volume of 0. Use the & symbol between two conditions when you subset the original data frame. 
+
+Hint 2: Subset the diamonds data frame under the conditions and save it into another variable. Use that data frame in the cor() function.
+
+```{r}
+diamonds_subset <- subset(diamonds, volume > 0 & volume <= 800)
+
+with(diamonds_subset, cor.test(volume, price))
+
+```
+
+# Subset the data to exclude diamonds with a volume
+# greater than or equal to 800. Also, exclude diamonds
+# with a volume of 0. Adjust the transparency of the
+# points and add a linear model to the plot. (See the
+# Instructor Notes or look up the documentation of
+# geom_smooth() for more details about smoothers.)
+
+# We encourage you to think about this next question and
+# to post your thoughts in the discussion section.
+
+# Do you think this would be a useful model to estimate
+# the price of diamonds? Why or why not?
+
+# This assignment is not graded and
+# will be marked as correct when you submit.
+
+# ENTER YOUR CODE BELOW THIS LINE
+# ========================================
+```{r}
+
+ggplot(aes(x = volume, y = price), 
+       data = diamonds_subset) + 
+  geom_point(alpha = 1/50) +
+  stat_smooth(method = "lm")
+  geom_smooth()
+```
+
+# Use the function dplyr package
+# to create a new data frame containing
+# info on diamonds by clarity.
+
+# Name the data frame diamondsByClarity
+
+# The data frame should contain the following
+# variables in this order.
+
+#       (1) mean_price
+#       (2) median_price
+#       (3) min_price
+#       (4) max_price
+#       (5) n
+
+# where n is the number of diamonds in each
+# level of clarity.
+
+```{r}
+
+library(dplyr)
+diamondsByClarity <- diamonds %>%
+  group_by(clarity) %>%
+  summarise(mean_price = mean(price),
+            median_price = median(as.numeric(price)),
+            min_price = min(price),
+            max_price = max(price),
+            n = n()) %>%
+  arrange(clarity) 
+
+```
+
+# We’ve created summary data frames with the mean price
+# by clarity and color. You can run the code in R to
+# verify what data is in the variables diamonds_mp_by_clarity
+# and diamonds_mp_by_color.
+
+# Your task is to write additional code to create two bar plots
+# on one output image using the grid.arrange() function from the package
+# gridExtra.
+
+# This assignment is not graded and
+# will be marked as correct when you submit.
+
+# See the Instructor Notes for more info on bar charts
+# and for a hint on this task.
+
+# DO NOT DELETE THE LINES OF CODE BELOW
+# ===================================================================
+
+```{r}
+data(diamonds)
+library(dplyr)
+
+diamonds_by_clarity <- group_by(diamonds, clarity)
+diamonds_mp_by_clarity <- summarise(diamonds_by_clarity, mean_price = mean(price))
+
+diamonds_by_color <- group_by(diamonds, color)
+diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
+```
+
+
+# ENTER YOUR CODE BELOW THIS LINE
+# ===================================================================
+
+```{r}
+library(gridExtra)
+
+p1 <- ggplot(aes(x = clarity, y = mean_price), 
+             data = diamonds_mp_by_clarity) +
+  geom_bar(stat = 'identity')
+
+p2 <- ggplot(aes(x = color, y = mean_price), 
+             data = diamonds_mp_by_color) +
+  geom_bar(stat = 'identity')
+
+grid.arrange(p1, p2, ncol = 1)
+```
+
+
+colour. diamond colour, from J (worst) to D (best)
+
+clarity. a measurement of how clear the diamond is (I1 (worst), SI1, SI2, VS1, VS2, VVS1, VVS2, IF (best))
+
+What do you notice in each of the bar charts for mean price by clarity and mean price by color?
+For clarity, the mean price is highest for the the second worst clarity, with the mean price decreasing in general as clarity increases. Since there are other factors that affect price (i.e., carats), this could be a result of fewer large diamonds with really good clarities. Similarly the mean price by color increases as the color worsens, again likely due to the fact that diamonds with really good color are probably smaller. 
+
+====================================================================
+
+
+# The Gapminder website contains over 500 data sets with information about
+# the world's population. Your task is to continue the investigation you did at the
+# end of Problem Set 3 or you can start fresh and choose a different
+# data set from Gapminder.
+
+# If you’re feeling adventurous or want to try some data munging see if you can
+# find a data set or scrape one from the web.
+
+# In your investigation, examine pairs of variable and create 2-5 plots that make
+# use of the techniques from Lesson 4.
+
+# You can find a link to the Gapminder website in the Instructor Notes.
+
+# Once you've completed your investigation, create a post in the discussions that includes:
+#       1. the variable(s) you investigated, your observations, and any summary statistics
+#       2. snippets of code that created the plots
+#       3. links to the images of your plots
+
+# Copy and paste all of the code that you used for
+# your investigation, and submit it when you are ready.
+# ====================================================================
+
+```{r}
+install.packages('tidyr', dependencies = TRUE)
+library(tidyr)
+
+cell_data <- read.csv('cell_phone_per_100.csv', header = T, row.names = NULL , check.names = F)
+
+
+us_data <- subset(cell_data_t, Country == 'United_States')
+
+summary(cell_data$'2011')
+
+cell_data_t <- as.data.frame(t(cell_data[,-1]))
+# first remember the names
+n <- cell_data$Country
+
+# transpose all but the first column (name)
+colnames(cell_data_t) <- n
+cell_data_t$myfactor <- factor(row.names(cell_data_t))
+
+cell_data_t1 <- gather(cell_data_t, 'Country', 'cell_phones', 2:ncol(cell_data_t))
+summary(cell_data_t$'United_States')
+
+ggplot(aes(x = cell_data$'2011', y = cell_data$'2010'), 
+       data = cell_data) + 
+  geom_point()
+
+ggplot(aes(x = cell_data_t$United_States, y = cell_data_t$China), 
+       data = cell_data_t) + 
+  geom_point()
+
+ggplot(aes(x = cell_data_t$United_States, y = cell_data_t$Japan), 
+       data = cell_data_t) + 
+  geom_point()
+```
+

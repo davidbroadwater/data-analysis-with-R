@@ -1,0 +1,114 @@
+# install these if necessary
+install.packages('GGally', 
+                 repos = "http://cran.us.r-project.org")
+install.packages('scales', 
+                 repos = "http://cran.us.r-project.org")
+install.packages('memisc', 
+                 repos = "http://cran.us.r-project.org")
+install.packages('lattice', 
+                 repos = "http://cran.us.r-project.org")
+install.packages('MASS', 
+                 repos = "http://cran.us.r-project.org")
+install.packages('car', 
+                 repos = "http://cran.us.r-project.org")
+install.packages('reshape', 
+                 repos = "http://cran.us.r-project.org")
+install.packages('plyr', 
+                 repos = "http://cran.us.r-project.org")
+
+# load the ggplot graphics package and the others
+library(ggplot2)
+library(GGally)
+library(scales)
+library(memisc)
+
+
+# Scratch 
+
+## Quality Vs Density
+```{r echo=FALSE, Bivariate_Plots_Density_Quality_Boxplot}
+with(wine, by(density, factor(quality), summary))
+
+ggplot(aes(x = factor(quality), y = density), data = wine) +
+  geom_boxplot()
+```
+It looks like density tends to decrease with higher rated wines. I wonder if there is a relationship between alcohol and density, especially since this plot almost looks like an inverse of the previous plot (albeit with more outliers).
+
+```{r echo=FALSE, Bivariate_Plots_Density_Alcohol}
+ggplot(aes(x = alcohol, y = density), data = wine) +
+  geom_point(alpha = 1/2, position = 'jitter') +
+  geom_smooth()
+```
+It definitely looks like there is some sort of inverse relationship between density and alcohol content, which makes sense since pure ethanol alcohol has a density of 0.79 g/cm^3 according to Wolfram|Alpha, compared to water's density of 1.00 g/cm^3. 
+
+##Quality vs pH
+```{r echo=FALSE, Bivariate_Plots_Quality_pH_Scatter}
+ggplot(aes(x = quality, y = pH), data = wine) +
+  geom_point(alpha = 1/2, position = 'jitter')
+```
+I wonder what the relationship looks like between pH and quality (despite the very poor correlation value of -0.05 between them). 
+
+```{r echo=FALSE, Bivariate_Plots_Quality_pH_Boxplot}
+with(wine, by(pH, factor(quality), summary))
+
+ggplot(aes(x = factor(quality), y = pH), data = wine) +
+  geom_boxplot()
+```
+It looks like there is a similar trend as with the density (and an inverse of the alcohol plot), but with many more outliers (which is probably what drove down the correlation). Based on the similarity in the boxplots, I wonder if pH and density are related. 
+
+```{r echo=FALSE, Bivariate_Plots_Density_pH_Boxplot}
+ggplot(aes(x = density, y = pH), data = wine) +
+  geom_point()
+
+ggplot(aes(x = density, y = pH), data = wine) +
+  geom_point(alpha = 1/3)
+```
+It looks like there is a general inverse relationship between the two. Some of the points in the middle look a bit overplotted, so I'll add some jitter and transparency. It looks like most of the values are pretty widely dispersed in the center of the plot, so the relationship doesn't look quite as strong. 
+
+
+Density plot of density by quality
+```{r echo=FALSE, Multivariate_Plots_Density_by_Quality_Density_Plot}
+ggplot(aes(x = density, color = factor(quality)), data = wine) +
+  geom_density() +
+  scale_color_discrete(name="Quality")
+```
+
+
+Density vs alcohol by quality
+```{r echo=FALSE, Multivariate_Plots_Density_Alcohol_by_Quality}
+ggplot(aes(x = density, y = alcohol, color = factor(quality)), data = wine) +
+  geom_point(position = 'jitter') + 
+  scale_color_brewer(type = 'div',
+    guide = guide_legend(title = 'Quality'))
+```
+
+
+## Quality and others
+
+free.sulfur.dioxide.ratio vs quality
+```{r echo=FALSE, Multivariate_Plots_Free.Sulfur.Dioxide.Ratio_Quality}
+with(wine, by(free.sulfur.dioxide.ratio, factor(quality), summary))
+
+ggplot(aes(x = factor(quality), y = free.sulfur.dioxide.ratio), data = wine) +
+  geom_boxplot()
+```
+
+```{r echo=FALSE, Multivariate_Plots_Total_Acidity_pH_by_Quality}
+ggplot(aes(x = total.acidity, y = pH, color = factor(quality)), data = wine) +
+  geom_point(position = 'jitter') +
+  coord_trans(x = 'log10') +
+  scale_color_brewer(type = 'div') +
+  stat_smooth(method = 'lm', formula = y ~ log10(x), color = 'blue')
+
+ggplot(aes(x = total.acidity, y = pH, color = factor(quality)), data = wine) +
+  geom_point(position = 'jitter') + 
+  scale_color_brewer(type = 'div',
+    guide = guide_legend(title = 'Quality')) +
+  coord_trans(x = 'log10')
+
+ggplot(aes(x = total.acidity, y = pH, color = factor(quality)), data = wine) +
+  geom_point(position = 'jitter') +
+  coord_trans(x = 'log10') +
+  scale_color_brewer(type = 'div') +
+  stat_smooth(method = 'lm', formula = y ~ log10(x), color = 'blue')
+```
