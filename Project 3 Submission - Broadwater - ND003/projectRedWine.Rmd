@@ -334,11 +334,16 @@ I suspect that part of this is because a beer/wine/spirit with a higher alcohol 
 ```{r echo=FALSE, Bivariate_Plots_Quality_Alcohol_Boxplot}
 with(wine, by(alcohol, factor(quality), summary))
 with(wine, by(alcohol, factor(quality), IQR))
+
 ggplot(aes(x = factor(quality), y = alcohol), data = wine) +
   geom_boxplot()
+
+ggplot(aes(x = factor(quality), y = alcohol), data = wine) +
+  geom_boxplot() +
+  ylim(min(wine$alcohol), quantile(wine$alcohol, 0.99))
 ```
 
-I made quality a factored variable to create a boxplot. Here the relationship between quality and alcohol is much easier to see. It's important to remember that there aren't as many wines rated highly, but there definitely appears to be a positive relationship between alcohol and quality. The lowest rated wines (with a quality of 3) all had alcohol values less than or equal to 11%, while roughly 75% of the highly rated (quality of 7 or 8) wines had alcohol values greater than 11% abv. Wines with a quality of 8 had the largest inter-quartile range (1.55 % by volume), while wines rated as 5 had quite a few outliers at high alcohol values, but also had the lowest inter-quartile range (0.8 % by volume). With the exception of wines rated as a 5, there is a clear positive relationship between alcohol and quality.
+I made quality a factored variable to create a boxplot. The limits were adjusted in the second boxplot to remove some of the outliers. Here the relationship between quality and alcohol is much easier to see. It's important to remember that there aren't as many wines rated highly, but there definitely appears to be a positive relationship between alcohol and quality. The lowest rated wines (with a quality of 3) all had alcohol values less than or equal to 11%, while roughly 75% of the highly rated (quality of 7 or 8) wines had alcohol values greater than 11% abv. Wines with a quality of 8 had the largest inter-quartile range (1.55 % by volume), while wines rated as 5 had quite a few outliers at high alcohol values, but also had the lowest inter-quartile range (0.8 % by volume). With the exception of wines rated as a 5, there is a clear positive relationship between alcohol and quality.
 
 ```{r echo=FALSE, Bivariate_Plots_Alcohol_Histogram_by_Quality}
 ggplot(aes(x = alcohol), data = wine) +
@@ -347,7 +352,15 @@ ggplot(aes(x = alcohol), data = wine) +
   scale_fill_discrete(name="Quality")
 ```
 
-Finally, here's a histogram of alcohol value by quality. Here it's very apparent how many more wines are rated as 4 or 5 (82.4%) than all of the other ratings. The wine with the highest alcohol content (14.9 % by volume) had a rating of 5 (perhaps because it was "unbalanced"), while otherwise most of the wines with higher alcohol contents had ratings in the 6-8 range. On the other end of the spectrum, one of the two wines with the lowest alcohol contents (8.4 % by volume) was rated as a 3, while the other was rated as a 6. There definitely seems to be some other factors influencing quality, as I would suspect. 
+Here's a stacked histogram of alcohol value colored by quality rating. Note that since the counts are stacked on top of one another (i.e., the maximum count value for each bin is the sum of ALL of the counts for each quality rating in that bin), it's the relative count of each rating within each bin that is important. Put another way, it shows how the quality ratings are distributed for each bin of the histogram created in the Univariate section. It's very apparent how many more wines are rated as 4 or 5 (82.4%) than all of the other ratings. The wine with the highest alcohol content (14.9 % by volume) had a rating of 5 (perhaps because it was "unbalanced"), while otherwise most of the wines with higher alcohol contents had ratings in the 6-8 range. On the other end of the spectrum, one of the two wines with the lowest alcohol contents (8.4 % by volume) was rated as a 3, while the other was rated as a 6. There definitely seems to be some other factors influencing quality, as I would suspect.
+
+```{r echo=FALSE, Bivariate_Plots_Alcohol_by_Quality_Density_Plot}
+ggplot(aes(x = alcohol, color = factor(quality)), data = wine) +
+  geom_density() +
+  scale_color_discrete(name="Quality")
+```
+
+Finally, let's look at some density plots of the alcohol percentages broken out by quality. In general, the same trends we saw in the boxplots hold here. It's still a bit strange that the wines rated as 5 are the mostly skewed toward smaller alcohol percentages, but that explains the low median value from the boxplots.
 
 ## Quality vs Volatile Acidity
 ```{r echo=FALSE, Bivariate_Plots_Quality_Volatile_Acidity_Scatter}
@@ -362,9 +375,21 @@ Since volatile acidity had the second strongest correlation with quality, let's 
 ```{r echo=FALSE, Bivariate_Plots_Quality_Volatile_Acidity_Boxplot}
 ggplot(aes(x = factor(quality), y = volatile.acidity), data = wine) +
   geom_boxplot()
+
+ggplot(aes(x = factor(quality), y = volatile.acidity), data = wine) +
+  geom_boxplot() +
+  ylim(min(wine$volatile.acidity), quantile(wine$volatile.acidity, 0.99))
 ```
 
 Here the inverse relationship is much more apparent. There is a definite trend in lower volatile acidity levels as wine quality increases; the median volatile acidity level drops with each successive increase in quality rating, with the exception of 7 and 8, where the median stays the same. Since we know from the background info that high levels of volatile acidity can cause the wine to taste like vinegar, this inverse relationship between volatile acidity and quality makes sense. 
+
+```{r echo=FALSE, Bivariate_Plots_Volatile.Acidity_by_Quality_Density_Plot}
+ggplot(aes(x = volatile.acidity, color = factor(quality)), data = wine) +
+  geom_density() +
+  scale_color_discrete(name="Quality")
+```
+
+These density plots of volatile acidity by quality rating explain the bimodal distribution seen in the histogram of volatile acidity values. The lower rated wines (3-6) explain the peak in values around we saw around 0.60 g/dm^3, while the higher rated wines explain the peak in values around 0.40 g/dm^3. The wines rated in the middle of the scale (5-6), also had slight bimodal distributions themselves. 
 
 ## Quality vs Sulphates
 
@@ -380,9 +405,21 @@ The next strongest correlation value for quality was with sulphates concentratio
 ```{r echo=FALSE, Bivariate_Plots_Quality_Sulphates_Boxplot}
 ggplot(aes(x = factor(quality), y = sulphates), data = wine) +
   geom_boxplot()
+
+ggplot(aes(x = factor(quality), y = sulphates), data = wine) +
+  geom_boxplot() +
+  ylim(min(wine$sulphates), quantile(wine$sulphates, 0.95))
 ```
 
 Here the positive relationship between sulphates and quality is more apparent, but it is also clear there are a large number of outliers for the wines rated as 5 or 6. This likely drove down the correlation value. The median sulphate concentration increases with each quality rating (again, except for 7 and 8, where it remains the same). We know from the background info that sulphates act as an antimicrobial, so perhaps the microbes they are killing have an adverse affect on the perceived quality. 
+
+```{r echo=FALSE, Bivariate_Plots_Sulphates_by_Quality_Density_Plot}
+ggplot(aes(x = sulphates, color = factor(quality)), data = wine) +
+  geom_density() +
+  scale_color_discrete(name="Quality")
+```
+
+It's a bit harder to see the relationship between quality and sulphates in this density plot, but the peak densities mostly increase with rating, matching the trend we saw in the boxplots. The plots for ratings 3-5 and 7-8 almost completely overlap each other, respectively (not counting the outliers).
 
 ```{r echo=FALSE, Bivariate_Plots_Quality_Citric_Acid_Scatter}
 with(wine, by(citric.acid, factor(quality), summary))
@@ -396,9 +433,21 @@ Finally, let's look at quality and citric acid plotted against each other. Wow, 
 ```{r echo=FALSE, Bivariate_Plots_Quality_Citric_Acid_Boxplot}
 ggplot(aes(x = factor(quality), y = citric.acid), data = wine) +
   geom_boxplot()
+
+ggplot(aes(x = factor(quality), y = citric.acid), data = wine) +
+  geom_boxplot() +
+  ylim(min(wine$citric.acid), quantile(wine$citric.acid, 0.99))
 ```
 
 The boxplot makes this positive relationship much clearer, with the median citric acid concentrations increasing steadily with each successive quality rating, from a median value of 0.0350 g/dm^3 for wines rated 3, up to a median value of 0.420 g/dm^3 for wines rated 8. The median values almost seem to be grouped together in rating pairs (3-4, 5-6, 7-8). I'm surprised by the overall variance across the values. 
+
+```{r echo=FALSE, Multivariate_Plots_Citric.Acid_by_Quality_Density_Plot}
+ggplot(aes(x = citric.acid, color = factor(quality)), data = wine) +
+  geom_density() +
+  scale_color_discrete(name="Quality")
+```
+
+There are some really unusual distributions in the plots. They are consistent with the observation earlier that certain values (0, 0.24, and 0.49) were more likely than others. This is especially apparent for wines rated 5 and 6, where there are distinct local maxima in the density plots around those values. Despite the unusual peaks, it is clear that higher rated wines tended to have larger citric concentrations than lower rated wines.
 
 ## Other Relationships: Acidty and pH
 
@@ -489,48 +538,19 @@ Ignoring the (uninteresting) strong relationships involving the new variables an
 
 # Multivariate Plots Section 
 
-## Quality Density Plots
-
-```{r echo=FALSE, Multivariate_Plots_Alcohol_by_Quality_Density_Plot}
-ggplot(aes(x = alcohol, color = factor(quality)), data = wine) +
-  geom_density() +
-  scale_color_discrete(name="Quality")
-```
-
-Let's look at some density plots of the alcohol percentages broken out by quality. In general, the same trends we saw in the boxplots hold here. It's still a bit strange that the wines rated as 5 are the mostly skewed toward smaller alcohol percentages, but that explains the low median value from the boxplots.
-
-```{r echo=FALSE, Multivariate_Plots_Volatile.Acidity_by_Quality_Density_Plot}
-ggplot(aes(x = volatile.acidity, color = factor(quality)), data = wine) +
-  geom_density() +
-  scale_color_discrete(name="Quality")
-```
-
-These density plots of volatile acidity by quality rating explain the bimodal distribution seen in the histogram of volatile acidity values. The lower rated wines (3-6) explain the peak in values around we saw around 0.60 g/dm^3, while the higher rated wines explain the peak in values around 0.40 g/dm^3. The wines rated in the middle of the scale (5-6), also had slight bimodal distributions themselves. 
-
-```{r echo=FALSE, Multivariate_Plots_Sulphates_by_Quality_Density_Plot}
-ggplot(aes(x = sulphates, color = factor(quality)), data = wine) +
-  geom_density() +
-  scale_color_discrete(name="Quality")
-```
-
-It's a bit harder to see the relationship between quality and sulphates in this density plot, but the peak densities mostly increase with rating, matching the trend we saw in the boxplots. The plots for ratings 3-5 and 7-8 almost completely overlap each other, respectively (not counting the outliers).
-
-```{r echo=FALSE, Multivariate_Plots_Citric.Acid_by_Quality_Density_Plot}
-ggplot(aes(x = citric.acid, color = factor(quality)), data = wine) +
-  geom_density() +
-  scale_color_discrete(name="Quality")
-```
-
-There are some really unusual distributions in the plots. They are consistent with the observation earlier that certain values (0, 0.24, and 0.49) were more likely than others. This is especially apparent for wines rated 5 and 6, where there are distinct local maxima in the density plots around those values. Despite the unusual peaks, it is clear that higher rated wines tended to have larger citric concentrations than lower rated wines.
-
 ## Quality and Acidity
 
 Total Acidity vs Quality
 ```{r echo=FALSE, Multivariate_Plots_Total.Acidity_Quality}
 with(wine, by(total.acidity, factor(quality), summary))
 with(wine, by(total.acidity, factor(quality), IQR))
+
 ggplot(aes(x = factor(quality), y = total.acidity), data = wine) +
   geom_boxplot()
+
+ggplot(aes(x = factor(quality), y = total.acidity), data = wine) +
+  geom_boxplot() +
+  ylim(min(wine$total.acidity), quantile(wine$total.acidity, 0.98))
 ```
 
 Now let's examine some of the acidity relationships a bit deeper. Total acidity and quality were very weakly correlated overall (0.086), and that's evident in the boxplots. With the exception of the lowest rated wines, the inter-quartile ranges increased with rating. I suspect the weak correlation is due in part to the opposite effects citric acid and acetic acid have on quality, keeping the overall acidity values roughly level. 
@@ -549,6 +569,10 @@ with(wine, by(citric.acid.ratio, factor(quality), summary))
 
 ggplot(aes(x = factor(quality), y = citric.acid.ratio), data = wine) +
   geom_boxplot()
+
+ggplot(aes(x = factor(quality), y = citric.acid.ratio), data = wine) +
+  geom_boxplot() +
+  ylim(min(wine$citric.acid.ratio), quantile(wine$citric.acid.ratio, 0.99))
 ```
 
 The citric acid ratios are much smaller than the volatile acidity ratios, with most of the ratios falling below 0.05. Otherwise, this looks very similar to the citric acid boxplot seen earlier, except with more outliers. 
@@ -577,9 +601,12 @@ p2 <- ggplot(aes(x = total.acidity, y = pH), data = wine) +
 grid.arrange(p1, p2, nrow = 1)
 
 theme_set(theme_minimal(18))
+
+summary(lm(wine$pH ~ log10(wine$fixed.acidity)))
+summary(lm(wine$pH ~ log10(wine$total.acidity)))
 ```
 
-Now we can plot the total acidity against pH as we did before with fixed acidity. I wonder how they look side-by-side. Unsurprisingly, they are very similar, since the same physical relationship between acidity and pH holds. Additionally, fixed and total acidity only differ by the volatile acidity concentrations, which are very small compared to both. 
+Now we can plot the total acidity against pH as we did before with fixed acidity. I wonder how they look side-by-side. Unsurprisingly, they are very similar, since the same physical relationship between acidity and pH holds. Additionally, fixed and total acidity only differ by the volatile acidity concentrations, which are very small compared to both. The R-squared values for each of the linear regression models were very close as well; `fixed.acidity` had a slightly better fit, with an R-squared value of 0.4989, while `total.acidity' had an R-squared value of 0.4787. However, the fact they are so much less than 1.0 suggests there are other relationships not captured by the models. 
 
 ```{r echo=FALSE, Multivariate_Plots_Volatile.Acidity_Alcohol_by_Quality}
 ggplot(aes(x = volatile.acidity, y = alcohol, color = factor(quality)), 
@@ -629,21 +656,12 @@ I did not, mainly because none of the relationships seemed strong enough to just
 # Change theme presets to defaults to accomodate plot text better
 theme_set(theme_minimal())
 
-p3 <- ggplot(aes(x = citric.acid, fill = factor(quality)), data = wine) +
-  geom_histogram(binwidth = 0.01) +
-  scale_fill_discrete(name="Quality")  +
-  ggtitle("Citric Acid Concentration by Quality Rating in Wine") +
-  xlab("Citric Acid (g/dm^3)") +
-  ylab("Number of Wines")
-
-p4 <- ggplot(aes(x = citric.acid, color = factor(quality)), data = wine) +
+ggplot(aes(x = citric.acid, color = factor(quality)), data = wine) +
   geom_density() +
   scale_color_discrete(name="Quality") +
   ggtitle("Density of Citric Acid Concentration by Quality Rating in Wine") +
   xlab("Citric Acid (g/dm^3)") +
   ylab("Density")
-
-grid.arrange(p3, p4, ncol = 1)
 ```
 
 ### Description One
@@ -653,30 +671,19 @@ Citric acid concentration and quality rating had a positive relationship, with h
 ### Plot Two
 
 ```{r echo=FALSE, Plot_Two}
-p5 <- ggplot(aes(x = factor(quality), 
-                 y = alcohol, 
-                 fill = factor(quality)), 
-             data = wine) +
+
+ggplot(aes(x = factor(quality), y = alcohol), data = wine) +
   geom_boxplot() +
   guides(fill=FALSE) + 
   ggtitle("Wine ABV by Quality") +
   ylab("Alcohol (% by volume)") +
   xlab("Wine Quality Rating")
 
-p6 <- ggplot(aes(x = alcohol, color = factor(quality)), data = wine) +
-  geom_density() +
-  ggtitle("Density of Wine ABV by Quality") +
-  scale_color_discrete(name="Quality") +
-  xlab("Alcohol (% by volume)") + 
-  ylab("Density")
-
-grid.arrange(p5, p6, ncol = 1)
-
 ```
 
 ### Description Two
 
-Alcohol had the strongest correlation with red wine quality (0.476) among all of the chemical properties measured. The lowest rated wines (with a quality of 3) all had alcohol values less than or equal to 11%, while roughly 75% of the highly rated (quality of 7 or 8) wines had alcohol values greater than 11% abv. The wines rated as a 5 were skewed heavily toward lower percentages (as clearly shown in the density plot), while the rest of the wines were more evenly distributed. With the exception of wines rated as a 5, there was a clear positive relationship between alcohol and quality. This makes sense since I'd expect a higher alcohol content would be related to a higher concentration of flavor. Lower concentrations of alcohol would likely have more of a "watery" mouthfeel in comparison and might not be perceived has being of a high quality.
+Alcohol had the strongest correlation with red wine quality (0.476) among all of the chemical properties measured. The lowest rated wines (with a quality of 3) all had alcohol values less than or equal to 11%, while roughly 75% of the highly rated (quality of 7 or 8) wines had alcohol values greater than 11% abv. With the exception of wines rated as a 5, there was a clear positive relationship between alcohol and quality. This makes sense since I'd expect a higher alcohol content would be related to a higher concentration of flavor. Lower concentrations of alcohol would likely have more of a "watery" mouthfeel in comparison and might not be perceived has being of a high quality.
 
 ### Plot Three
 

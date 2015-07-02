@@ -19,3 +19,5 @@ http://www.sciencedirect.com/science/article/pii/S0167923609001377
 https://en.wikipedia.org/wiki/Box_plot
 http://www.cookbook-r.com/Graphs/Legends_(ggplot2)/
 http://www.cookbook-r.com/Graphs/Axes_(ggplot2)/
+http://data.princeton.edu/R/linearmodels.html
+http://stackoverflow.com/questions/2870631/what-is-the-difference-between-multiple-r-squared-and-adjusted-r-squared-in-a-si
